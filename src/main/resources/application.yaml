@@ -1,11 +1,13 @@
 spring:
   application:
     name: ms-user
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/user_db
-    username: root
-    password: root2004
+    url: jdbc:postgresql://localhost:5432/ms_user_db
+    username: guest
+    password: guest
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,10 +15,29 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-jwt:
-  secret: "Zm9vYmFyYmF6cXV4eHl6Zm9vYmFyYmF6cXV4eHl6Zm9vYmFyYmF6cXV4eHl6MTIzNDU2"
-  expirationMs: 600000
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
-server:
-  port: 6223
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: ms-user-group
+      auto-offset-reset: earliest
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # ms-auth tərəfindən verilən JWK URI
+          jwk-set-uri: http://localhost:8081/.well-known/jwks.json
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.springframework.kafka: INFO
